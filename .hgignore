@@ -3,3 +3,7 @@ syntax: regexp
 ^test/doc$
 syntax: regexp
 ^lib$
+syntax: regexp
+^doc$
+syntax: regexp
+^release$
