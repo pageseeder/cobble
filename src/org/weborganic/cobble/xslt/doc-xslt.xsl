@@ -473,7 +473,7 @@ exclude-result-prefixes="#all">
       <author name="{f:trim($text)}"/>
     </xsl:when>
     <xsl:when test="$name = 'return' or $name = 'returns'">
-      <return name="{f:trim($text)}"/>
+      <return description="{f:trim($text)}"/>
     </xsl:when>
     <xsl:when test="$name = 'context'">
       <context select="{f:trim(substring-before($text, ' '))}" description="{f:trim(substring-after($text, ' '))}"/>
