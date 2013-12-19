@@ -130,6 +130,7 @@ article ul {padding: 0 16px; margin: 8px 0}
 
 .xsltdoc h4 {border-top: 2px solid #eee}
 .xsltdoc code {color: #666; font-size: 12px}
+.xsltdoc pre {background: #FFF4E5; border-left: 5px solid #FFC472; font-size: 90%;}
 
 .xsltdoc .template-title           {color: #cef; background: #01ACF1; font-size: 15px;  padding: 4px 2px}
 .xsltdoc .template-title .mode     {color: #fff; background: #ADF101; color: #464646; font-size: 15px; font-weight: 600; padding: 0 2px; margin: 0 2px; float: right}

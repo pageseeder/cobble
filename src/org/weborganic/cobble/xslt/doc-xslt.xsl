@@ -513,11 +513,11 @@ exclude-result-prefixes="#all">
         <xsl:for-each-group select="current-group()" group-adjacent="boolean(self::li)">
           <xsl:choose>
             <xsl:when test="self::li">
-              <ul>
+              <xsl:element name="{if (@numbered) then 'ol' else 'ul'}">
                 <xsl:for-each select="current-group()">
                   <li><xsl:sequence select="f:beautify(text())"/></li>
                 </xsl:for-each>
-              </ul>
+              </xsl:element>
             </xsl:when>
             <xsl:otherwise>
               <xsl:for-each-group select="current-group()" group-adjacent="boolean(self::pre)">
@@ -567,10 +567,11 @@ exclude-result-prefixes="#all">
       <xsl:when test="not(matches($line, '\S'))">
         <break/>
       </xsl:when>
-      <xsl:when test="matches($line, '^\s*(-|\+|x)\s.+')">
+      <xsl:when test="matches($line, '^\s*(-|\+|x|\d+\.)\s.+')">
         <li>
-          <xsl:if test="not(matches($lines[$i -1], '^\s*(-|\+|x)\s.+'))"><xsl:attribute name="item">start</xsl:attribute></xsl:if>
-          <xsl:sequence select="f:trim(replace($line, '^\s*(-|\+|x)\s+(.+)$', '$2'))"/>
+          <xsl:if test="matches($line, '^\s*(\d+\.)\s.+')"><xsl:attribute name="numbered">true</xsl:attribute></xsl:if>
+          <xsl:if test="not(matches($lines[$i -1], '^\s*(-|\+|x|\d+\.)\s.+'))"><xsl:attribute name="start">true</xsl:attribute></xsl:if>
+          <xsl:sequence select="f:trim(replace($line, '^\s*(-|\+|x|\d+\.)\s+(.+)$', '$2'))"/>
         </li>
       </xsl:when>
       <xsl:when test="matches($line, '^\s{4}')">

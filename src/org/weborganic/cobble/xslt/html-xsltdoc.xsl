@@ -88,6 +88,20 @@
   <h1>Stylesheet: <xsl:value-of select="@name"/></h1>
   <p class="path"><xsl:value-of select="@path"/></p>
   <xsl:copy-of select="doc/description/*"/>
+  <xsl:apply-templates select="doc/author"  mode="xsltdoc"/>
+  <xsl:apply-templates select="doc/version" mode="xsltdoc"/>
+  <xsl:if test="doc/see">
+    <dl>
+      <dt>See:</dt>
+      <xsl:for-each select="doc/see">
+       <dd><xsl:apply-templates select="." mode="xsltdoc"/></dd>
+      </xsl:for-each>
+    </dl>
+  </xsl:if>
+  <xsl:if test="doc/author">
+    <p>Author: <xsl:for-each select="doc/author"><xsl:value-of select="." /></xsl:for-each></p>
+  </xsl:if>
+  <xsl:apply-templates select="doc/author"/>
   <xsl:if test="import">
     <h2>Imports</h2>
     <ul class="imports"><xsl:apply-templates select="import" mode="xsltdoc"/></ul>
@@ -295,6 +309,7 @@
     </thead>
     <tbody>
       <xsl:for-each select="parameter">
+        <xsl:variable name="name" select="@name"/>
         <tr>
           <td><var><xsl:value-of select="@name"/></var></td>
           <td><code><xsl:value-of select="@as"/></code></td>
@@ -302,7 +317,7 @@
             <td><xsl:value-of select="@select"/></td>
             <td><xsl:value-of select="@tunnel"/></td>
           </xsl:if>
-          <td><xsl:copy-of select="$doc/parameter[@name = current()/@name]/@description"/></td>
+          <td><xsl:value-of select="$doc/parameter[@name = $name]/@description"/></td>
         </tr>
       </xsl:for-each>
     </tbody>
@@ -318,6 +333,18 @@
   <td><xsl:value-of select="@as"/></td>
   <td><xsl:copy-of select="doc/description"/></td>
 </tr>
+</xsl:template>
+
+<xsl:template match="context" mode="xsltdoc">
+  <p>Context: <xsl:value-of select="@select"/></p>
+</xsl:template>
+
+<xsl:template match="see" mode="xsltdoc">
+  <a href="{@href}"><xsl:value-of select="@description"/></a>
+</xsl:template>
+
+<xsl:template match="visibility" mode="xsltdoc">
+  <p>Visibility: <xsl:value-of select="@is"/></p>
 </xsl:template>
 
 <!--
