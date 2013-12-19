@@ -445,14 +445,14 @@ exclude-result-prefixes="#all">
 <xsl:function name="f:analyse-comment">
   <xsl:param name="c" as="comment()"/>
   <xsl:variable name="buffer">
-	  <xsl:analyze-string regex="@([\w\-]+)\s+(.+)" select="$c">
-	    <xsl:matching-substring>
-	      <xsl:sequence select="f:analyse-annotation(regex-group(1), regex-group(2))"/>
-	    </xsl:matching-substring>
-	    <xsl:non-matching-substring>
-	      <text><xsl:value-of select="." /></text>
-	    </xsl:non-matching-substring>
-	  </xsl:analyze-string>
+    <xsl:analyze-string regex="@([\w\-]+)(\s+(.+))?" select="$c">
+      <xsl:matching-substring>
+        <xsl:sequence select="f:analyse-annotation(regex-group(1), regex-group(3))"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <text><xsl:value-of select="." /></text>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
   </xsl:variable>
   <description>
     <xsl:sequence select="f:analyse-description(string-join($buffer//text, ' '))"/>
@@ -464,10 +464,22 @@ exclude-result-prefixes="#all">
 
 <xsl:function name="f:analyse-annotation">
   <xsl:param name="name" as="xs:string"/>
-  <xsl:param name="text" as="xs:string"/>
+  <xsl:param name="text" as="xs:string?"/>
   <xsl:choose>
     <xsl:when test="$name = 'param' and contains($text, ' ')">
       <parameter name="{f:trim(substring-before($text, ' '))}" description="{f:trim(substring-after($text, ' '))}"/>
+    </xsl:when>
+    <xsl:when test="$name = 'context'and contains($text, ' ')">
+      <context select="{f:trim(substring-before($text, ' '))}" description="{f:trim(substring-after($text, ' '))}"/>
+    </xsl:when>
+    <xsl:when test="$name = 'see' and contains($text, ' ')">
+      <see href="{f:trim(substring-before($text, ' '))}" description="{f:trim(substring-after($text, ' '))}"/>
+    </xsl:when>
+    <xsl:when test="$name = 'see'">
+      <see href="{f:trim($text)}" description="{f:trim($text)}"/>
+    </xsl:when>
+    <xsl:when test="$name = 'version'">
+      <version name="{f:trim($text)}"/>
     </xsl:when>
     <xsl:when test="$name = 'author'">
       <author name="{f:trim($text)}"/>
@@ -476,35 +488,131 @@ exclude-result-prefixes="#all">
       <return description="{f:trim($text)}"/>
     </xsl:when>
     <xsl:when test="$name = 'context'">
-      <context select="{f:trim(substring-before($text, ' '))}" description="{f:trim(substring-after($text, ' '))}"/>
+      <context select="{f:trim($text)}"/>
+    </xsl:when>
+    <xsl:when test="$name = 'public' or $name = 'private'">
+      <visibility is="{$name}"/>
     </xsl:when>
     <xsl:otherwise>
-      <annotation name="{$name}" text="{f:trim($text)}"/>
+      <annotation name="{$name}">
+        <xsl:if test="$text"><xsl:attribute name="text" select="f:trim($text)"/></xsl:if>
+      </annotation>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:function>
 
 <xsl:function name="f:analyse-description">
   <xsl:param name="description" as="xs:string"/>
-  <xsl:variable name="p" select="tokenize($description, '\.\n')"/>
-  <xsl:for-each select="$p">
-    <xsl:variable name="trimmed" select="f:trim(.)"/>
+  <xsl:variable name="analysed" select="f:parse-lines(tokenize($description, '\n'))" as="element()*"/>
+  <xsl:for-each-group select="$analysed" group-adjacent="boolean(self::p)">
     <xsl:choose>
-      <!-- Probably a piece of code -->
-      <xsl:when test="contains($trimmed, '&lt;') and contains($trimmed, '>')">
-        <pre><xsl:value-of select="$trimmed"/></pre>
+      <xsl:when test="self::p">
+        <p><xsl:sequence select="f:beautify(string-join(current-group()/text(), ' '))"/></p>
       </xsl:when>
-      <!-- Default to a paragraph otherwise -->
-      <xsl:when test="$trimmed != ' '">
-        <p><xsl:value-of select="$trimmed"/><xsl:if test="not(matches($trimmed, '\.$'))">.</xsl:if></p>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each-group select="current-group()" group-adjacent="boolean(self::li)">
+          <xsl:choose>
+            <xsl:when test="self::li">
+              <ul>
+                <xsl:for-each select="current-group()">
+                  <li><xsl:sequence select="f:beautify(text())"/></li>
+                </xsl:for-each>
+              </ul>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each-group select="current-group()" group-adjacent="boolean(self::pre)">
+                <xsl:if test="self::pre">
+                <pre><xsl:for-each select="current-group()">
+                  <xsl:value-of select="."/><xsl:text>&#xa;</xsl:text>
+                </xsl:for-each></pre>
+                </xsl:if>
+              </xsl:for-each-group>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each-group>
+      </xsl:otherwise>
     </xsl:choose>
-  </xsl:for-each>
+  </xsl:for-each-group>
 </xsl:function>
 
 <xsl:function name="f:trim">
   <xsl:param name="t" as="xs:string"/>
-  <xsl:sequence select="replace($t, '^\s*(.+?)\s*$', '$1')"/>
+  <xsl:sequence select="if (matches($t, '\S+')) then replace($t, '^\s*(.+?)\s*$', '$1') else ''"/>
+</xsl:function>
+
+<xsl:function name="f:linkify">
+  <xsl:param name="t" as="xs:string"/>
+  <xsl:analyze-string regex="(https?://\S+)" select="$t">
+    <xsl:matching-substring>
+      <a href="{.}"><xsl:value-of select="."/></a>
+    </xsl:matching-substring>
+    <xsl:non-matching-substring>
+      <xsl:value-of select="."/>
+    </xsl:non-matching-substring>
+  </xsl:analyze-string>
+</xsl:function>
+
+<xsl:function name="f:parse-lines" as="element()*">
+  <xsl:param name="lines" as="xs:string*"/>
+  <xsl:sequence select="f:parse-line($lines, 1, count($lines))"/>
+</xsl:function>
+
+<xsl:function name="f:parse-line" as="element()*">
+  <xsl:param name="lines"      as="xs:string*"/>
+  <xsl:param name="i"    as="xs:integer"/>
+  <xsl:param name="total" as="xs:integer"/>
+  <xsl:if test="not($i gt $total)">
+    <xsl:variable name="line" select="$lines[$i]"/>
+    <xsl:choose>
+      <xsl:when test="not(matches($line, '\S'))">
+        <break/>
+      </xsl:when>
+      <xsl:when test="matches($line, '^\s*(-|\+|x)\s.+')">
+        <li>
+          <xsl:if test="not(matches($lines[$i -1], '^\s*(-|\+|x)\s.+'))"><xsl:attribute name="item">start</xsl:attribute></xsl:if>
+          <xsl:sequence select="f:trim(replace($line, '^\s*(-|\+|x)\s+(.+)$', '$2'))"/>
+        </li>
+      </xsl:when>
+      <xsl:when test="matches($line, '^\s{4}')">
+        <pre><xsl:sequence select="substring($line, 5)"/></pre>
+      </xsl:when>
+      <xsl:otherwise>
+        <p><xsl:sequence select="f:trim($line)"/></p>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:sequence select="f:parse-line($lines, $i+1, $total)"/>
+  </xsl:if>
+</xsl:function>
+
+<!--
+  Beautify the code
+-->
+<xsl:function name="f:beautify" as="node()*">
+  <xsl:param name="t" as="xs:string"/>
+  <xsl:analyze-string select="$t" flags="x" regex='(__(.*?)__)
+                                                 | (\*(.*?)\*)
+                                                 | (`(.*?)`)
+                                                 | ("(.*?)"\[(.*?)\])'>
+   <xsl:matching-substring>
+     <xsl:choose>
+       <xsl:when test="regex-group(1)">
+         <strong><xsl:sequence select="f:beautify(regex-group(2))"/></strong>
+       </xsl:when>
+       <xsl:when test="regex-group(3)">
+         <em><xsl:sequence select="f:beautify(regex-group(4))"/></em>
+       </xsl:when>
+       <xsl:when test="regex-group(5)">
+         <code><xsl:sequence select="regex-group(6)"/></code>
+       </xsl:when>
+       <xsl:when test="regex-group(7)">
+         <a href="{regex-group(9)}"><xsl:sequence select="regex-group(8)"/></a>
+       </xsl:when>
+     </xsl:choose>
+   </xsl:matching-substring>
+   <xsl:non-matching-substring>
+    <xsl:value-of select="."/>
+   </xsl:non-matching-substring>
+  </xsl:analyze-string>
 </xsl:function>
 
 <!--

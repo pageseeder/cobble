@@ -7,8 +7,8 @@
                               xmlns:xf="http://weborganic.org/XSLT/Documentation"
                               exclude-result-prefixes="#all">
 
-<!-- 
-  Root template to generate the HTML from generated XSLT documentation.  
+<!--
+  Root template to generate the HTML from generated XSLT documentation.
 -->
 <xsl:template match="xsltdoc" mode="cobble-nav">
 <xsl:if test="count(stylesheet) > 1">
@@ -33,8 +33,8 @@
 </xsl:if>
 </xsl:template>
 
-<!-- 
-  Root template to generate the HTML from generated XSLT documentation.  
+<!--
+  Root template to generate the HTML from generated XSLT documentation.
 -->
 <xsl:template match="xsltdoc" mode="cobble-doc">
 <article id="cobble-doc">
@@ -45,18 +45,18 @@
 </article>
 </xsl:template>
 
-<!-- 
+<!--
   Generates the navigation and summary page for when a collection of templates is being viewed.
 -->
 <xsl:template match="xsltdoc" mode="xsltdoc-summary">
-	<section class="xsltdoc" id="xslt-summary">
-	  <h1>Summary</h1>
-	  <xsl:apply-templates select="stylesheet[1]/output" mode="xsltdoc"/>
-	  <xsl:call-template name="global-parameters"/>
-	  <xsl:call-template name="global-variables"/>
-	  <xsl:call-template name="template-summary"/>
-	  <xsl:call-template name="function-summary"/>
-	</section>
+  <section class="xsltdoc" id="xslt-summary">
+    <h1>Summary</h1>
+    <xsl:apply-templates select="stylesheet[1]/output" mode="xsltdoc"/>
+    <xsl:call-template name="global-parameters"/>
+    <xsl:call-template name="global-variables"/>
+    <xsl:call-template name="template-summary"/>
+    <xsl:call-template name="function-summary"/>
+  </section>
   <section class="xsltdoc" id="xslt-functions">
     <h1>All functions</h1>
     <xsl:apply-templates select="stylesheet/function" mode="xsltdoc">
@@ -246,15 +246,17 @@
   named <var><xsl:value-of select="@name"/></var>
 </xsl:if>
 <xsl:if test="@mode">
-  <span class="mode"><xsl:value-of select="@mode"/></span>
+  <xsl:for-each select="tokenize(@mode, '\s+')">
+    <span class="mode"><xsl:value-of select="."/></span>
+  </xsl:for-each>
 </xsl:if>
 <xsl:if test="@priority">
   <span class="priority"><xsl:value-of select="@priority"/></span>
 </xsl:if>
 </h3>
 <xsl:if test="@match">
-	<p>Priority: <var><xsl:value-of select="if (@priority) then @priority else @implicit-priority"/></var><xsl:if test="not(@priority)"><xsl:text> </xsl:text><small>(implicit)</small></xsl:if></p>
-	<p>Mode: <var><xsl:value-of select="if (@mode) then @mode else '#default'"/></var><xsl:if test="not(@mode)"><xsl:text> </xsl:text><small>(implicit)</small></xsl:if></p>
+  <p>Priority: <var><xsl:value-of select="if (@priority) then @priority else @implicit-priority"/></var><xsl:if test="not(@priority)"><xsl:text> </xsl:text><small>(implicit)</small></xsl:if></p>
+  <p>Mode: <var><xsl:value-of select="if (@mode) then @mode else '#default'"/></var><xsl:if test="not(@mode)"><xsl:text> </xsl:text><small>(implicit)</small></xsl:if></p>
 </xsl:if>
 <xsl:copy-of select="doc/description/*" />
 <xsl:call-template name="local-parameters"/>
@@ -318,12 +320,12 @@
 </tr>
 </xsl:template>
 
-<!-- 
+<!--
   Display the mode for a template.
-  
+
   @param mode The template mode
-  
-  @return the mode 
+
+  @return the mode
 -->
 <xsl:function name="xf:mode-for-template" as="element(span)">
 <xsl:param name="mode" as="xs:string?"/>
@@ -333,12 +335,12 @@
 </xsl:choose>
 </xsl:function>
 
-<!-- 
+<!--
   Display the priority for a template.
-  
+
   @param priority The template priority
   @param implicit The implicit priority computed by the XSLT doc tool
-  
+
   @return the specified or implied priority.
 -->
 <xsl:function name="xf:priority-for-template" as="element(span)">
