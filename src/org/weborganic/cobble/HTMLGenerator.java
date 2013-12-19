@@ -62,8 +62,10 @@ public final class HTMLGenerator {
 
   /**
    * Generates the documentation as HTML.
+   *
+   * @throws Wraps any occurring exception.
    */
-  public void generate(final File target) {
+  public void generate(final File target) throws CobbleException {
     File dir = target.isDirectory()? target : target.getParentFile();
     File html = target.isDirectory()? new File(target, this._code.getName()+".html") : target;
 
@@ -82,10 +84,9 @@ public final class HTMLGenerator {
       transformer.transform(new StreamSource(xmldoc), new StreamResult(html));
 
     } catch (TransformerException ex) {
-      // FIXME error handling
-      ex.printStackTrace();
+      throw new CobbleException("Unable to generate HTML documentation", ex);
     } catch (IOException ex) {
-      ex.printStackTrace();
+      throw new CobbleException("Unable to generate HTML documentation", ex);
     }
 
     try {
@@ -96,8 +97,7 @@ public final class HTMLGenerator {
         Resources.copyTo("jquery-1.10.2.min.js", dir);
       }
     } catch (IOException ex) {
-      // FIXME error handling
-      ex.printStackTrace();
+      throw new CobbleException("Unable to generate HTML documentation", ex);
     }
   }
 

@@ -5,11 +5,18 @@ exclude-result-prefixes="#all">
 
 <!--
   OK, let's try this tag `<code>`
-  with multiple paragraphs
+  with a paragraphs across
+  *multiple* lines and includes a
+  few links like <http://pageseeder.com> or <mailto:test@dispostable.com>
+  or [PageSeeder developers](https://dev.pageseeder.com) but not <code/>
 
   Here is a list:
   - This item *one*
   - And __two__
+
+  Now we have an ordered list:
+  1. First item
+  2. Second item
 
   Some code:
      <alice>

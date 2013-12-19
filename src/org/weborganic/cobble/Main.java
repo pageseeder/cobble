@@ -19,7 +19,7 @@ public final class Main {
   private Main() {
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws CobbleException {
     if (args.length == 0) {
       System.err.println("Usage");
       System.err.println("  java -jar wo-cobble.jar [file]");

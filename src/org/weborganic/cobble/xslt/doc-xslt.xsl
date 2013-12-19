@@ -445,7 +445,7 @@ exclude-result-prefixes="#all">
 <xsl:function name="f:analyse-comment">
   <xsl:param name="c" as="comment()"/>
   <xsl:variable name="buffer">
-    <xsl:analyze-string regex="@([\w\-]+)(\s+(.+))?" select="$c">
+    <xsl:analyze-string regex="\s+@([\w\-]+)(\s+(.+))?" select="$c">
       <xsl:matching-substring>
         <xsl:sequence select="f:analyse-annotation(regex-group(1), regex-group(3))"/>
       </xsl:matching-substring>
@@ -567,11 +567,11 @@ exclude-result-prefixes="#all">
       <xsl:when test="not(matches($line, '\S'))">
         <break/>
       </xsl:when>
-      <xsl:when test="matches($line, '^\s*(-|\+|x|\d+\.)\s.+')">
+      <xsl:when test="matches($line, '^\s*(-|\+|\*|\d+\.)\s.+')">
         <li>
           <xsl:if test="matches($line, '^\s*(\d+\.)\s.+')"><xsl:attribute name="numbered">true</xsl:attribute></xsl:if>
-          <xsl:if test="not(matches($lines[$i -1], '^\s*(-|\+|x|\d+\.)\s.+'))"><xsl:attribute name="start">true</xsl:attribute></xsl:if>
-          <xsl:sequence select="f:trim(replace($line, '^\s*(-|\+|x|\d+\.)\s+(.+)$', '$2'))"/>
+          <xsl:if test="not(matches($lines[$i -1], '^\s*(-|\+|\*|\d+\.)\s.+'))"><xsl:attribute name="start">true</xsl:attribute></xsl:if>
+          <xsl:sequence select="f:trim(replace($line, '^\s*(-|\+|\*|\d+\.)\s+(.+)$', '$2'))"/>
         </li>
       </xsl:when>
       <xsl:when test="matches($line, '^\s{4}')">
@@ -586,27 +586,46 @@ exclude-result-prefixes="#all">
 </xsl:function>
 
 <!--
-  Beautify the code
+  Beautify the text by using markdown style inline markup such as codes, links and emphases.
+
+  @param t the string to beautify
+  @return the corresponding set of nodes
 -->
 <xsl:function name="f:beautify" as="node()*">
   <xsl:param name="t" as="xs:string"/>
-  <xsl:analyze-string select="$t" flags="x" regex='(__(.*?)__)
+  <xsl:analyze-string select="$t" flags="x" regex='(_(.*?)_)
                                                  | (\*(.*?)\*)
+                                                 | (__(.*?)__)
+                                                 | (\*\*(.*?)\*\*)
                                                  | (`(.*?)`)
-                                                 | ("(.*?)"\[(.*?)\])'>
+                                                 | (\[(.*?)\]\((.*?)\))
+                                                 | (&lt;((https?://|mailto:).*?)>)'>
    <xsl:matching-substring>
      <xsl:choose>
+       <!-- Simple emphases -->
        <xsl:when test="regex-group(1)">
-         <strong><xsl:sequence select="f:beautify(regex-group(2))"/></strong>
+         <em><xsl:sequence select="f:beautify(regex-group(2))"/></em>
        </xsl:when>
        <xsl:when test="regex-group(3)">
          <em><xsl:sequence select="f:beautify(regex-group(4))"/></em>
        </xsl:when>
+       <!-- Strong emphases -->
        <xsl:when test="regex-group(5)">
-         <code><xsl:sequence select="regex-group(6)"/></code>
+         <strong><xsl:sequence select="f:beautify(regex-group(6))"/></strong>
        </xsl:when>
        <xsl:when test="regex-group(7)">
-         <a href="{regex-group(9)}"><xsl:sequence select="regex-group(8)"/></a>
+         <strong><xsl:sequence select="f:beautify(regex-group(8))"/></strong>
+       </xsl:when>
+       <!-- Code -->
+       <xsl:when test="regex-group(9)">
+         <code><xsl:sequence select="regex-group(10)"/></code>
+       </xsl:when>
+       <!-- Links -->
+       <xsl:when test="regex-group(11)">
+         <a href="{regex-group(13)}"><xsl:sequence select="regex-group(12)"/></a>
+       </xsl:when>
+       <xsl:when test="regex-group(14)">
+         <a href="{regex-group(15)}"><xsl:sequence select="regex-group(15)"/></a>
        </xsl:when>
      </xsl:choose>
    </xsl:matching-substring>
@@ -643,7 +662,7 @@ exclude-result-prefixes="#all">
       <xsl:when test="$pattern = 'attribute()'">-0.5</xsl:when>
       <xsl:when test="$pattern = 'element(*)'">-0.5</xsl:when>
       <xsl:when test="$pattern = 'attribute(*)'">-0.5</xsl:when>
-      <!--  -->
+      <!-- Wild cards and namespaces -->
       <xsl:when test="matches($pattern, '^[\w\-]+:\*$')">-0.25</xsl:when>
       <xsl:when test="matches($pattern, '^\*:[\w\-]+$')">-0.25</xsl:when>
       <!-- Specify a predicate -->
