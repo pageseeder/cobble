@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+  Ant file to test the stylesheets
+
   @author Christophe Lauret
-  @version 22 November 2013
 -->
 <project name="cobble-test" >
 
@@ -10,7 +11,7 @@
 -->
 <target name="test-template-xslt-xml">
   <mkdir dir="doc/xml"/>
-  <xslt in="code/sample.xsl" style="../src/org/weborganic/cobble/xslt/doc-xslt.xsl" out="doc/xml/sample.xsl.xml"/>
+  <xslt in="code/sample.xsl" style="../src/main/java/org/pageseeder/cobble/xslt/doc-xslt.xsl" out="doc/xml/sample.xsl.xml"/>
 </target>
 
 <!--
@@ -18,7 +19,7 @@
 -->
 <target name="test-template-schematron-xml">
   <mkdir dir="doc/xml"/>
-  <xslt in="code/sample.sch" style="../src/org/weborganic/cobble/xslt/doc-schematron.xsl" out="doc/xml/sample.sch.xml"/>
+  <xslt in="code/sample.sch" style="../src/main/java/org/pageseeder/cobble/xslt/doc-schematron.xsl" out="doc/xml/sample.sch.xml"/>
 </target>
 
 <!--
@@ -26,7 +27,8 @@
 -->
 <target name="test-java-xslt-xml">
   <mkdir dir="doc/xml"/>
-  <java classname="org.weborganic.cobble.Main" classpath="../classes;../lib/saxonhe-9.5.1.3.jar">
+	<!-- FIXME Path to Saxon lib -->
+  <java classname="org.pageseeder.cobble.Main" classpath="../classes;../lib/saxonhe-9.5.1.3.jar">
     <arg value="code/sample.xsl"/>
   </java>
 </target>
@@ -36,7 +38,8 @@
 -->
 <target name="test-java-xslt-html">
   <mkdir dir="doc/xml"/>
-  <java classname="org.weborganic.cobble.Main" classpath="../classes;../lib/saxonhe-9.5.1.3.jar">
+	<!-- FIXME Path to Saxon lib -->
+  <java classname="org.pageseeder.cobble.Main" classpath="../classes;../lib/saxonhe-9.5.1.3.jar">
     <arg value="code/sample.xsl"/>
     <arg value="-html"/>
     <arg value="-o"/><arg value="doc/html"/>
