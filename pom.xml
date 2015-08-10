@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pageseeder.cobble</groupId>
   <artifactId>pso-cobble</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.0</version>
   <name>Cobble</name>
   <description>Documentation for XML-based languages</description>
 
@@ -26,6 +26,7 @@
     <connection>scm:git:git@github.com:pageseeder/cobble.git</connection>
     <developerConnection>scm:git:git@github.com:pageseeder/cobble.git</developerConnection>
     <url>git@github.com:pageseeder/cobble.git</url>
+    <tag>pso-cobble-0.3.0</tag>
   </scm>
 
   <organization>
