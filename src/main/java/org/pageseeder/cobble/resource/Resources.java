@@ -25,7 +25,6 @@ import java.io.OutputStream;
 
 /**
  * @author Christophe Lauret
- * @version 22 November 2013
  */
 public final class Resources {
 

@@ -34,7 +34,7 @@ public final class Main {
   public static void main(String[] args) throws CobbleException {
     if (args.length == 0) {
       System.err.println("Usage");
-      System.err.println("  java -jar wo-cobble.jar [file]");
+      System.err.println("  java -jar pso-cobble.jar [file]");
       System.exit(0);
     }
 
@@ -49,15 +49,18 @@ public final class Main {
     // Check output type
     boolean html = false;
     for (String arg : args) {
-      if (arg.equals("-html")) html = true;
+      if (arg.equals("-html")) {
+        html = true;
+      }
     }
 
     // Check of output file is specified
     boolean outputSpecified = false;
     File output = null;
     for (String arg : args) {
-      if (arg.equals("-o")) outputSpecified = true;
-      else if (outputSpecified) {
+      if (arg.equals("-o")) {
+        outputSpecified = true;
+      } else if (outputSpecified) {
         output = new File(arg);
         outputSpecified = false;
       }
@@ -70,10 +73,11 @@ public final class Main {
       generator.generate(output != null? output : new File("."));
     } else {
       XMLGenerator generator = new XMLGenerator(source);
-      if (output != null)
+      if (output != null) {
         generator.generate(output);
-      else
+      } else {
         generator.generate(System.out);
+      }
     }
   }
 }

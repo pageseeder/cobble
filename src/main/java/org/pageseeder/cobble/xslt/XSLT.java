@@ -31,7 +31,6 @@ import javax.xml.transform.stream.StreamSource;
 
 /**
  * @author Christophe Lauret
- * @version 22 November 2013
  */
 public final class XSLT {
 

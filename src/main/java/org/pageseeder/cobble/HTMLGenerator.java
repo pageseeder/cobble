@@ -33,7 +33,6 @@ import org.pageseeder.cobble.xslt.XSLT;
  * Generates the documentation from code comments in XML-based languages (XSLT, Schematron)
  *
  * @author Christophe Lauret
- * @version 13 November 2013
  */
 public final class HTMLGenerator {
 

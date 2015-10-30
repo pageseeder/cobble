@@ -34,19 +34,18 @@ import org.pageseeder.cobble.xslt.XSLT;
  * Generates the documentation from code comments in XML-based languages (XSLT, Schematron)
  *
  * @author Christophe Lauret
- * @version 20 December 2013
  */
 public final class XMLGenerator {
 
   /**
    * The resource path to templates generating the XSLT documentation.
    */
-  private static final String XSLTDOC_STYLESHEET = "org/weborganic/cobble/xslt/doc-xslt.xsl";
+  private static final String XSLTDOC_STYLESHEET = "org/pageseeder/cobble/xslt/doc-xslt.xsl";
 
   /**
    * The resource path to templates generating the Schematron documentation.
    */
-  private static final String SCHEMATRON_STYLESHEET = "org/weborganic/cobble/xslt/doc-schematron.xsl";
+  private static final String SCHEMATRON_STYLESHEET = "org/pageseeder/cobble/xslt/doc-schematron.xsl";
 
   /**
    * The file to generate documentation for.
@@ -95,10 +94,10 @@ public final class XMLGenerator {
   public void generate(Result result) throws CobbleException  {
     try {
       Transformer transformer = newTransformer();
+      if (transformer == null)
+        throw new CobbleException("No documentation template available for your document.");
       transformer.transform(new StreamSource(this._code), result);
-    } catch (TransformerException ex) {
-      throw new CobbleException("Unable to generate documentation as XML", ex);
-    } catch (IOException ex) {
+    } catch (TransformerException | IOException ex) {
       throw new CobbleException("Unable to generate documentation as XML", ex);
     }
   }
@@ -134,7 +133,6 @@ public final class XMLGenerator {
     File xml = target.isDirectory()? new File(target, this._code.getName()+".xml") : target;
     generate(new StreamResult(xml));
   }
-
 
   /**
    * Generates the documentation onto an output stream swallowing any occurring exception.
@@ -200,11 +198,14 @@ public final class XMLGenerator {
   private Transformer newTransformer()
       throws TransformerConfigurationException, IOException {
     Templates templates = getTemplates(this._code.getName());
+    if (templates == null) return null;
     Transformer transformer = templates.newTransformer();
-    if (this._encoding != null)
+    if (this._encoding != null) {
       transformer.setOutputProperty("encoding", this._encoding);
-    if (this._xmldeclaration)
+    }
+    if (this._xmldeclaration) {
       transformer.setOutputProperty("omit-xml-declaration", "no");
+    }
     return transformer;
   }
 

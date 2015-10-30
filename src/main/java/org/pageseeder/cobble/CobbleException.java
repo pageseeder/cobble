@@ -17,7 +17,6 @@ package org.pageseeder.cobble;
 
 /**
  * @author Christophe Lauret
- * @version 20 December 2013
  */
 public final class CobbleException extends Exception {
 
