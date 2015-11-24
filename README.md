@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/pageseeder/maven/cobble/images/download.svg) ](https://bintray.com/pageseeder/maven/cobble/_latestVersion)
+
 # Cobble
 
 Cobble is a simple Java tool to generate documentation for XML-based languages such as
