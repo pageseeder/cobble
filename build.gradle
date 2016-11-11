@@ -1,0 +1,29 @@
+plugins {
+  id "com.jfrog.bintray" version "1.7"
+}
+
+group       = 'org.pageseeder.cobble'
+version     = file('version.txt').text
+description = "$title"
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply from: 'gradle/publishing.gradle'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+}
+
+repositories {
+  maven { url 'http://dl.bintray.com/pageseeder/maven' }
+  jcenter()
+}
+
+dependencies {
+
+  runtime 'net.sf.saxon:Saxon-HE:9.6.0-6'
+
+}
