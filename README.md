@@ -1,5 +1,4 @@
-[ ![Download](https://api.bintray.com/packages/pageseeder/maven/cobble/images/download.svg) ](https://bintray.com/pageseeder/maven/cobble/_latestVersion)
-
+[![Maven Central](https://img.shields.io/maven-central/v/org.pageseeder.cobble/pso-cobble.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.pageseeder.cobble%22%20AND%20a:%22pso-cobble%22)
 # Cobble
 
 Cobble is a simple Java tool to generate documentation for XML-based languages such as
